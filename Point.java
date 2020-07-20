@@ -94,7 +94,7 @@ public class Point
 		implements Comparator<Point>
 	{
 		public int compare(Point p, Point q) {
-			return Double.compare(slopeTo(p), slopeTo(q));
+			return Double.compare(slopeTo(q), slopeTo(p));
 		}
 	}
 

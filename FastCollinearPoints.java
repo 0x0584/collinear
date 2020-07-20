@@ -9,14 +9,13 @@ import edu.princeton.cs.algs4.StdRandom;
 
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
-
 public class FastCollinearPoints
 {
 	private static final int width = 800, height = 600;
 	private static final int offset = 32768/20;
 	private static final String name = StdRandom.uniform(0, 326988) + " ";
+	// private final WeightedQuickUnionUF uf;
 
-	private final WeightedQuickUnionUF uf;
 
 	private static int img = 0;
 
@@ -36,8 +35,8 @@ public class FastCollinearPoints
 		return (i < 0 || i >= size || indices[i] < 0) ? null : pnts[indices[i]];
 	}
 
+		// uf = WeightedQuickUnionUF(size);
 	private void init(Point[] points) {
-		uf = WeightedQuickUnionUF(size);
 
 		n_segmts = 0;
 		pnts = points;
@@ -59,101 +58,104 @@ public class FastCollinearPoints
 		StdDraw.setPenColor(color);
 		StdDraw.setPenRadius(pensize);
 		tmp.draw();
-		StdDraw.save("grid" + "_" + img + ".png"); img++;
-		StdDraw.show();
+		// StdDraw.save("grid" + "_" + img + ".png"); img++;
 		StdOut.println(s + " |> " + tmp);
 	}
 
 	public int generate_segment(Point p, int j, double slp, java.awt.Color color) {
 		int k = j + 1;
 
-		Point s = p;
-		Point t = at(j);
+		Point s;
+		Point t;
 
-		StdDraw.setPenColor(StdDraw.BLUE);
-		StdDraw.setPenRadius(0.03);
-		p.draw(); at(j).draw();
-		StdOut.println("Point p fix:  " + s + "slope: " + p.slopeTo(p));
-		StdOut.println("Point at(j): " + t + "slope: " + p.slopeTo(t));
+		if (at(j).compareTo(p) > 0) { s = p;  t = at(j); }
+		else { s = at(j); t = p; }
 
-		StdDraw.setPenRadius(0.025);
-		for (; k < pnts.length && p.slopeTo(at(k)) == slp; k++) {
-			StdOut.println("Point: " + at(k) + "slope: " + p.slopeTo(at(k)));
-			if (at(k).compareTo(s) < 0) s = at(k);
-			if (at(k).compareTo(t) > 0 ) t = at(k);
-			StdDraw.setPenColor(StdDraw.YELLOW);
-			StdDraw.setPenRadius(0.03);
-			at(k).draw();
-			StdDraw.show();
-			drawSegment(" generate " + img, s, t, color, 0.002);
+		// StdOut.println("Point p fix:  " + s + "slope: " + p.slopeTo(p));
+		// StdOut.println("Point at(j): " + at(j) + "slope: " + p.slopeTo(at(j)));
+
+		// StdDraw.setPenRadius(0.01);
+		for (; k < size && p.slopeTo(at(k)) == slp; k++) {
+
+			// StdOut.println("Point: " + at(k) + "slope: "
+			// 			   + p.slopeTo(at(k)));
+
+			if (at(k).compareTo(s) < 0) {
+				// StdOut.println("a: " + s + " <-> " + at(k));
+				s = at(k);
+			} else {
+				// StdOut.println("a: " + s);
+			}
+
+			if (at(k).compareTo(t) > 0) {
+				// StdOut.println("b: " + t + " <-> " + at(k));
+				t = at(k);
+			} else {
+				// StdOut.println("b: " + t);
+			}
+
 		}
-		StdOut.println("////\n");
-			StdDraw.show();
+		// StdOut.println("////\n");
+		// StdDraw.show();
 
 		// k--;
 
 		if (k - j > 2) {
-			StdDraw.setPenColor(StdDraw.RED);
-			StdDraw.setPenRadius(0.004);
-			p.draw(); s.draw(); t.draw();
-			drawSegment(" yellow >>> " + img, s, t, StdDraw.YELLOW, 0.005);
 
 			resize();
 			LineSegment sg = new LineSegment(s, t);
 
-			segmts[n_segmts++] = sg;
-			StdOut.println("SEGMENT: " + sg);
-		}
+			for (int i = 0; i < n_segmts; ++i) {
+				// StdOut.println(sg + " ||| " + segmts[i]);
+				if (sg.toString().equals(segmts[i].toString()))
+					return k;
+			}
 
+
+			drawSegment("  >>> " + img, s, t, color, 0.003);
+			StdDraw.show();
+
+			segmts[n_segmts++] = sg;
+			// StdOut.println("SEGMENT: " + sg);
+		}
 
 		return k;
 	}
 
     // finds all line segments containing 4 or more points
 	public FastCollinearPoints(Point[] points) {
-		init(points);
-		java.awt.Color[] col = {StdDraw.RED, StdDraw.GREEN, StdDraw.BLUE,
-								StdDraw.ORANGE, StdDraw.BLACK, StdDraw.PINK};
+		java.awt.Color[] col = {StdDraw.GREEN, StdDraw.BLUE, StdDraw.ORANGE,
+								StdDraw.BLACK, StdDraw.PINK};
 
+		init(points);
 		for (Point p : points) {
 
 			merge.sort(p.slopeOrder());
 
-			StdOut.println(" fix point >> " + p);
+ 			// StdOut.println(" >>>>>>>>>>>>>>>>> SlopeOrder of " + p + "\n");
+			// for (int v : indices)
+			// 	StdOut.printf("%-25s | slope: %-25.3f |\n", pnts[v].toString(), p.slopeTo(pnts[v]));
+			// StdOut.println(" >>>>>>>>>>>>>>>>> SlopeOrder of " + p + "\n");
 
 			int k = 0;
-			for (int j = 1; j < size && at(j) != null; ++j) {
-				StdDraw.setPenColor(StdDraw.BLACK);
-				StdDraw.setPenRadius(0.03);
-				for (int i = 0, x, y; i < points.length; ++i)
-					points[i].draw();
-				StdDraw.setPenColor(StdDraw.ORANGE);
-				StdDraw.setPenRadius(0.03);
-				p.draw(); at(j).draw();
-				drawSegment(" green >>> ", p, at(j), StdDraw.GREEN, 0.001);
-				j = generate_segment(p, j, p.slopeTo(at(j)), col[k++ % col.length]);
-				StdDraw.show();
-			}
+			int prev = n_segmts;
 
-			for (int i = 0, x, y; i < points.length; ++i)
-				points[i].draw();
+			for (int j = 1; j < size && at(j) != null;) {
+				j = generate_segment(p, j, p.slopeTo(at(j)), StdDraw.BOOK_LIGHT_BLUE);
+			}
 			StdDraw.show();
 
-			StdOut.println("\n\n >>------ ######## SEGMENTS ########### ------\n " );
 			k = 0;
-			for (LineSegment segment : segments()) {
-				if (segment == null)
-					break;
-				StdOut.println(segment);
-				StdDraw.setPenColor(col[k++ % col.length]);
-				StdDraw.setPenRadius(0.008);
-				segment.draw();
+			if (n_segmts != prev) {
+				StdDraw.setPenColor(StdDraw.BOOK_BLUE);
+				// StdOut.println("\n >>------ |||||||||||||||||||||||||| ------ \n" );
+				for (int i = 0; i < n_segmts; ++i) {
+					// StdOut.println(segmts[i]);
+					segmts[i].draw();
+				}
+				StdDraw.show();
+				// StdOut.println("\n >>------ |||||||||||||||||||||||||| ------\n\n " );
 			}
-			StdDraw.show();
-
-			// eliminate(i);
-			StdOut.println(" >>------------\n\n " );
-
 		}
 		fit();
 	}
@@ -174,11 +176,67 @@ public class FastCollinearPoints
 	}
 
 	private void fit() {
-		LineSegment[] fresh = new LineSegment[n_segmts - 1];
+		LineSegment[] fresh = new LineSegment[n_segmts];
 		for (n_segmts = 0; n_segmts < fresh.length; ++n_segmts)
 			fresh[n_segmts] = segmts[n_segmts];
 		segmts = fresh;
 	}
+
+	public static void main(String[] args) {
+		// read the n points from a file
+		In in = new In(args[0]);
+		int n = in.readInt();
+		Point[] points = new Point[n];
+		int [][] xy = new int[n][2];
+
+		// draw the points
+		int xmax = -1;
+		int ymax = -1;
+		for (int i = 0; i < n; i++) {
+			int x = xy[i][0] = in.readInt();
+			int y = xy[i][1] = in.readInt();
+			if (x > xmax) xmax = x;
+			if (y > ymax) ymax = y;
+			points[i] = new Point(x, y);
+		}
+
+		StdDraw.setCanvasSize(width, height);
+		StdDraw.enableDoubleBuffering();
+
+		StdDraw.setPenColor(StdDraw.BOOK_RED);
+		StdDraw.setPenRadius(0.01);
+		StdDraw.setXscale(-offset, xmax + offset);
+		StdDraw.setYscale(-offset, ymax + offset);
+		for (int i = 0, x, y; i < points.length; ++i) {
+			points[i].draw();
+			// x = xy[i][0];
+			// y = xy[i][1];
+ 			// StdDraw.text(x,y-offset/2, x + "," + y, 0);
+		}
+		StdDraw.show();
+
+
+		FastCollinearPoints collinear = new FastCollinearPoints(points);
+		StdDraw.setPenColor(StdDraw.BOOK_RED);
+		StdDraw.setPenRadius(0.007);
+		StdOut.println(" >>> SEGMENTS!!! <<<<< ");
+		for (LineSegment segment : collinear.segments()) {
+			StdOut.println(segment);
+			segment.draw();
+		}
+		StdDraw.show();
+
+		// StdDraw.setPenColor(StdDraw.BOOK_RED);
+		// StdDraw.setPenRadius(0.01);
+		// for (int i = 0, x, y; i < points.length; ++i) {
+		// 	points[i].draw();
+		// 	// x = xy[i][0];
+		// 	// y = xy[i][1];
+		// 	// StdDraw.text(x,y-offset/2, "" + x + ", " + y, 0);
+		// }
+		// StdDraw.show();
+	}
+
 
 	private class Merge
 	{
@@ -227,56 +285,4 @@ public class FastCollinearPoints
 		}
 	}
 
-	public static void main(String[] args) {
-		// read the n points from a file
-		In in = new In(args[0]);
-		int n = in.readInt();
-		Point[] points = new Point[n];
-		int [][] xy = new int[n][2];
-
-		// draw the points
-		int xmax = -1;
-		int ymax = -1;
-		for (int i = 0; i < n; i++) {
-			int x = xy[i][0] = in.readInt();
-			int y = xy[i][1] = in.readInt();
-			if (x > xmax) xmax = x;
-			if (y > ymax) ymax = y;
-			points[i] = new Point(x, y);
-		}
-
-		StdDraw.setCanvasSize(width, height);
-		StdDraw.enableDoubleBuffering();
-
-		StdDraw.setPenColor(StdDraw.BOOK_RED);
-		StdDraw.setPenRadius(0.01);
-		StdDraw.setXscale(-offset, xmax + offset);
-		StdDraw.setYscale(-offset, ymax + offset);
-		for (int i = 0, x, y; i < points.length; ++i) {
-			points[i].draw();
-			x = xy[i][0];
-			y = xy[i][1];
- 			StdDraw.text(x,y-offset/2, x + "," + y, 0);
-		}
-		StdDraw.show();
-
-
-		StdOut.println(" >>> SEGMENTS!!! <<<<< ");
-		FastCollinearPoints collinear = new FastCollinearPoints(points);
-		for (LineSegment segment : collinear.segments()) {
-			StdOut.println(segment);
-			StdDraw.setPenColor(StdDraw.BOOK_BLUE);
-			StdDraw.setPenRadius(0.005);
-			segment.draw();
-		}
-		StdDraw.show();
-
-		// for (int i = 0, x, y; i < points.length; ++i) {
-		// 	points[i].draw();
-		// 	x = xy[i][0];
-		// 	y = xy[i][1];
-		// 	StdDraw.text(x,y-offset/2, "" + x + ", " + y, 0);
-		// }
-		// StdDraw.show();
-	}
 }
