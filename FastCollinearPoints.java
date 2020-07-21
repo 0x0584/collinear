@@ -93,11 +93,11 @@ public class FastCollinearPoints
 
 		resize();
 		segmts[n_segmts++] = new Segment(indexOf(s), indexOf(t), in_seg, slp);
-		drawSegment("SEGMENT: ", at(s), at(t), StdDraw.MAGENTA, 0.001);
-		for (int i = 0; i < n_segmts; ++i)
-			segmts[i].draw();
-		StdDraw.save("grid_" + img++ + ".png");
-		StdDraw.show();
+		// drawSegment("SEGMENT: ", at(s), at(t), StdDraw.MAGENTA, 0.001);
+		// for (int i = 0; i < n_segmts; ++i)
+		// 	segmts[i].draw();
+		// StdDraw.save("grid_" + img++ + ".png");
+		// StdDraw.show();
 	}
 
 	public int generate_segment(int j, double newslp, double slp) {
@@ -114,8 +114,8 @@ public class FastCollinearPoints
 		// StdOut.println("Point p fix:  " + at(s) + "slope: " + p.slopeTo(p));
 		// StdOut.println("Point at(j): " + at(j) + "slope: " + p.slopeTo(at(j)));
 
-		StdDraw.setPenRadius(0.003);
-		StdDraw.setPenColor(StdDraw.BLACK);
+		// StdDraw.setPenRadius(0.003);
+		// StdDraw.setPenColor(StdDraw.BLACK);
 
 		for (; k < size; k++) {
 
@@ -129,8 +129,8 @@ public class FastCollinearPoints
 					 || at(0).slopeTo(at(k)) == slp)
 				break;
 
-			at(k).draw();
-			StdDraw.show();
+			// at(k).draw();
+			// StdDraw.show();
 
 
 			if (at(s) == null || at(k).compareTo(at(s)) < 0)			s = k;
@@ -167,11 +167,11 @@ public class FastCollinearPoints
 
 		Point p = pnts[ipnt];
 
-		StdDraw.setPenRadius(0.005);
-		StdDraw.setPenColor(StdDraw.RED);
-		p.draw();
+		// StdDraw.setPenRadius(0.005);
+		// StdDraw.setPenColor(StdDraw.RED);
+		// p.draw();
 
-		StdOut.println(" Point p is fixed: " + p);
+		// StdOut.println(" Point p is fixed: " + p);
 
 		merge.sort(p.slopeOrder());
 
@@ -198,10 +198,10 @@ public class FastCollinearPoints
 		// }
 		// StdOut.println(" >>>> >>>>>>>>>>>>> SlopeOrder of " + p + "\n");
 
-		StdDraw.setPenColor(StdDraw.ORANGE);
-		StdDraw.setPenRadius(0.003);
-		pnts[ipnt].draw();
-		StdDraw.show();
+		// StdDraw.setPenColor(StdDraw.ORANGE);
+		// StdDraw.setPenRadius(0.003);
+		// pnts[ipnt].draw();
+		// StdDraw.show();
 
 		// StdOut.println("\n ||||||||||||||||||");
 		// for (Segment s : segmts)
@@ -215,15 +215,15 @@ public class FastCollinearPoints
 			// segmts[prev].draw();
 			// StdDraw.show();
 
-			StdDraw.setPenRadius(0.005);
-			StdDraw.setPenColor(StdDraw.MAGENTA);
-			// StdOut.println(" all found points \n");
-			for (int q : segmts[prev].A) {
-				if (pnts[q] == null) continue;
+			// StdDraw.setPenRadius(0.005);
+			// StdDraw.setPenColor(StdDraw.MAGENTA);
+			// // StdOut.println(" all found points \n");
+			// for (int q : segmts[prev].A) {
+			// 	if (pnts[q] == null) continue;
 				// StdOut.printf(pnts[q] + " ");
-				pnts[q].draw();
-				StdDraw.show();
-			}
+			// 	pnts[q].draw();
+			// 	StdDraw.show();
+			// }
 			// StdOut.println(" all found points relative to " + p + "\n");
 			// StdOut.printf("\n");
 
@@ -234,11 +234,11 @@ public class FastCollinearPoints
 				// StdOut.println("\n2 !!!!! recurse using : " + pnts[q] + " p: " + p + "\n\n");
 			}
 
-			StdDraw.setPenRadius(0.004);
-			StdDraw.setPenColor(StdDraw.CYAN);
+			// StdDraw.setPenRadius(0.004);
+			// StdDraw.setPenColor(StdDraw.CYAN);
 			for (int q : segmts[prev].A) {
-				if (pnts[q] != null)
-					pnts[q].draw();
+				// if (pnts[q] != null)
+				// 	pnts[q].draw();
 				pnts[q] = null;
 			}
 		}
@@ -258,13 +258,11 @@ public class FastCollinearPoints
 		for (int i = 0; i < size; ++i) {
 			// StdOut.println(" |||||||||| ################# ||||||||\n");
 			if (pnts[i] == null)
-			{
 				continue;
-			}
 			recurse_segments(i, Double.NEGATIVE_INFINITY);
-			StdDraw.setPenRadius(0.0075);
-			StdDraw.setPenColor(StdDraw.YELLOW);
-			pnts[i].draw();
+			// StdDraw.setPenRadius(0.0075);
+			// StdDraw.setPenColor(StdDraw.YELLOW);
+			// pnts[i].draw();
 			pnts[i] = null;
 		}
 		StdOut.println(" >>> !!! <<<<< ");
