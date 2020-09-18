@@ -76,9 +76,10 @@ public class FastCollinearPoints
 	}
 
 	private static java.awt.Color randomColor() {
-		return new java.awt.Color(StdRandom.uniform(StdRandom.uniform(1, 255 * 7)) / 7,
-								  StdRandom.uniform(StdRandom.uniform(1, 255 * 3)) / 3,
-								  StdRandom.uniform(StdRandom.uniform(1, 255 * 5)) / 5);
+		// return new java.awt.Color(StdRandom.uniform(StdRandom.uniform(1, 255 * 7)) / 7,
+		// 						  StdRandom.uniform(StdRandom.uniform(1, 255 * 3)) / 3,
+		// 						  StdRandom.uniform(StdRandom.uniform(1, 255 * 5)) / 5);
+		return StdDraw.MAGENTA;
 	}
 
 	private void append_segment(int s, int t, int k, int j, double slp, java.awt.Color color) {
@@ -90,7 +91,7 @@ public class FastCollinearPoints
 		resize();
 		segmts[n_segmts++] = new Segment(indexOf(s), indexOf(t), in_seg, slp);
 		StdDraw.setPenColor(color);
-		StdDraw.setPenRadius(0.005);
+		StdDraw.setPenRadius(0.001);
 		segmts[n_segmts - 1].draw();
 		StdDraw.show();
 		StdOut.println(segmts[n_segmts - 1]);
@@ -146,7 +147,7 @@ public class FastCollinearPoints
 		merge.sort(pnts[ipnt].slopeOrder());
 
 		StdDraw.setPenColor(StdDraw.GREEN);
-		StdDraw.setPenRadius(0.008);
+		StdDraw.setPenRadius(0.02);
 		fixed().draw();
 		StdDraw.show();
 
@@ -160,15 +161,18 @@ public class FastCollinearPoints
 
 
 		StdDraw.setPenColor(StdDraw.RED);
-		StdDraw.setPenRadius(0.008);
+		StdDraw.setPenRadius(0.01);
 		p.draw();
 		StdDraw.show();
+
+		StdDraw.save("foo.png");
 
 		pnts[ipnt] = null;
 
 		for (int l = n_segmts; prev < l; ++prev) {
 			for (int q : segmts[prev].A)
 				recurse_segments(q, randomColor());
+			// StdDraw.save("foo.png");
 		}
 	}
 
@@ -217,7 +221,7 @@ public class FastCollinearPoints
 
 		// draw the points
 		StdDraw.setPenColor(StdDraw.BOOK_RED);
-		StdDraw.setPenRadius(0.005);
+		StdDraw.setPenRadius(0.01);
 		int xmax = -1;
 		int ymax = -1;
 		for (int i = 0; i < n; i++) {
@@ -243,7 +247,7 @@ public class FastCollinearPoints
 
 		// print and draw the line segments
 		FastCollinearPoints collinear = new FastCollinearPoints(points);
-		StdDraw.setPenRadius(0.01);
+		StdDraw.setPenRadius(0.003);
 		for (LineSegment segment : collinear.segments()) {
 			StdDraw.setPenColor(randomColor());
 			segment.draw();
