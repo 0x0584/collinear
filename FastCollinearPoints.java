@@ -58,6 +58,7 @@ public class FastCollinearPoints
 
 	private int   indexOf(int i)	{ return indices[i]; }
 	private Point at(int i)			{ return pnts[indices[i]];}
+	private Point fixed() { return at(0); }
 
 	///////////////////////////////////////////////////////////////////////////////
 
@@ -75,14 +76,7 @@ public class FastCollinearPoints
 			indices[i] = i;
 	}
 
-	private static java.awt.Color randomColor() {
-		// return new java.awt.Color(StdRandom.uniform(StdRandom.uniform(1, 255 * 7)) / 7,
-		// 						  StdRandom.uniform(StdRandom.uniform(1, 255 * 3)) / 3,
-		// 						  StdRandom.uniform(StdRandom.uniform(1, 255 * 5)) / 5);
-		return StdDraw.MAGENTA;
-	}
-
-	private void append_segment(int s, int t, int k, int j, double slp, java.awt.Color color) {
+	private void append_segment(int s, int t, int k, int j, double slp) {
 		int[] in_seg = new int[k - j];
 
 		for (int u = j; u < k; ++u)
@@ -90,98 +84,65 @@ public class FastCollinearPoints
 
 		resize();
 		segmts[n_segmts++] = new Segment(indexOf(s), indexOf(t), in_seg, slp);
-		StdDraw.setPenColor(color);
-		StdDraw.setPenRadius(0.001);
-		segmts[n_segmts - 1].draw();
-		StdDraw.show();
-		StdOut.println(segmts[n_segmts - 1]);
 	}
 
-	public int generate_segment(int j, double newslp, java.awt.Color color) {
-		int s = 0, t = j;
+	private boolean match_segment(Point p, Point q) {
+		for (Segment s : segmts)
+			if (s == null) break;
+			else if (s.belong(p) && s.belong(q))
+				return true;
+		return false;
+	}
 
+	public int generate_segment(int j, double newslp) {
+		int s = 0, t = j; // segment [s, t]
 		if (at(s).compareTo(at(t)) > 0) {
-			s = j; t = 0;
+			s = j; t = 0; // fixed
 		}
 
-		int k = j + 1;
-		int n_pnts = 0;
+		int k = j + 1, loop = 0; // we need 4 collinear, hence we already fixed 2
 		for (; k < size; k++) {
-			if (at(k) == null || at(0).slopeTo(at(k)) != newslp)
+			// either we ran out of points or not collinear
+			if (at(k) == null || fixed().slopeTo(at(k)) != newslp)
 				break;
-			n_pnts++;
+			loop++;
+			// augment both ends of the segment
 			if (at(s) == null || at(k).compareTo(at(s)) < 0)
 				s = k;
 			else if (at(t) == null || at(k).compareTo(at(t)) > 0)
 				t = k;
 		}
+		// segment is not complete
 		if (at(s) == null || at(t) == null)
 			return -1;
-		if (n_pnts > 1) {
-			if (checkAllSegments(at(s), at(t)))
+		// we found 2 or more points
+		if (loop > 1)
+			// skip found segments
+			if (match_segment(at(s), at(t)))
 				return k;
-			append_segment(s, t, k, j, newslp, color);
-		}
-		return k < size && at(k) == null ? -1 : k;
+			else
+				append_segment(s, t, k, j, newslp);
+		return k < size && at(k) == null? -1 : k;
 	}
 
-
-	private Point fixed() { return at(0); }
-
-	private boolean checkAllSegments(Point p, Point q) {
-		for (Segment s : segmts) {
-			if (s == null)
-				break;
-			if (s.belong(p) && s.belong(q)) {
-				StdOut.println(p + "and " + q + " belong to " + s);
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private void recurse_segments(int ipnt, java.awt.Color color) {
+	private void recurse_segments(int ipnt) {
 		if (pnts[ipnt] == null)
 			return ;
-
 		merge.sort(pnts[ipnt].slopeOrder());
-
-		StdDraw.setPenColor(StdDraw.GREEN);
-		StdDraw.setPenRadius(0.02);
-		fixed().draw();
-		StdDraw.show();
-
-		Point p = pnts[ipnt];
 		int prev = n_segmts;
-
-		StdDraw.setPenColor(color);
-		for (int j = 1; j > 0 && j < size && at(j) != null;) {
-			j = generate_segment(j, fixed().slopeTo(at(j)), color);
-		}
-
-
-		StdDraw.setPenColor(StdDraw.RED);
-		StdDraw.setPenRadius(0.01);
-		p.draw();
-		StdDraw.show();
-
-		StdDraw.save("foo.png");
-
+		for (int j = 1; j > 0 && j < size && at(j) != null;)
+			j = generate_segment(j, fixed().slopeTo(at(j)));
 		pnts[ipnt] = null;
-
-		for (int l = n_segmts; prev < l; ++prev) {
+		for (int l = n_segmts; prev < l; ++prev)
 			for (int q : segmts[prev].A)
-				recurse_segments(q, randomColor());
-			// StdDraw.save("foo.png");
-		}
+				recurse_segments(q);
 	}
 
 	// finds all line segments containing 4 or more points
 	public FastCollinearPoints(Point[] points) {
 		init(points);
-		for (int i = 0; i < size; ++i) {
-			recurse_segments(i, randomColor());
-		}
+		for (int i = 0; i < size; ++i)
+			recurse_segments(i);
 	}
 
 	// the number of line segments
@@ -237,23 +198,18 @@ public class FastCollinearPoints
 			points[i].draw();
 			x = xy[i][0];
 			y = xy[i][1];
-			// StdDraw.text(x,y-offset/2, "" + x + ", " + y, 0);
 		}
 		StdDraw.show();
 
-		java.awt.Color[] colors = {StdDraw.RED, StdDraw.GREEN, StdDraw.BLUE,
-								   StdDraw.CYAN, StdDraw.MAGENTA, StdDraw.BLACK};
-		int col = 0;
-
 		// print and draw the line segments
 		FastCollinearPoints collinear = new FastCollinearPoints(points);
+		StdDraw.setPenColor(StdDraw.BOOK_BLUE);
 		StdDraw.setPenRadius(0.003);
 		for (LineSegment segment : collinear.segments()) {
-			StdDraw.setPenColor(randomColor());
 			segment.draw();
-			StdDraw.show();
 			StdOut.println(segment);
 		}
+		StdDraw.show();
 	}
 
 
